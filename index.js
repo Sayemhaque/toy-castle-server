@@ -1,6 +1,6 @@
 const express = require('express');
 const cors = require('cors');
-const { MongoClient, ServerApiVersion } = require('mongodb');
+const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
 const app = express()
 const PORT = process.env.PORT || 5000;
 require("dotenv").config();
@@ -26,8 +26,16 @@ async function run() {
   try {
     // Connect the client to the server	(optional starting in v4.7)
     await client.connect();
-     
+   
     const toysCollection = client.db("toy-castle").collection("toys")
+    const galleryCollection = client.db("toy-castle").collection("gallery")
+    const exclusiveCollection = client.db("toy-castle").collection("exclusive-toys")
+
+    const indexKeys = { toyName: 1,};
+    const indexOptions = { name: "toyName" };
+    const result = await toysCollection.createIndex(indexKeys, indexOptions);
+
+
     
     //post toy to the database
     app.post('/toys' , async (req,res) => {
@@ -36,10 +44,50 @@ async function run() {
         res.send(result)
     })
 
+    //get all toys
+    app.get('/toys' , async (req,res) => {
+      const result = await toysCollection.find().limit(20).toArray()
+      res.send(result)
+     })
+      // get my toys
+      app.get('/toys/email', async(req,res) => {
+         const email = req.query?.email;
+         const result = await toysCollection.find({sellerEmail:email}).toArray()
+         res.send(result)
+      })
+    //get single toy
+     app.get('/toydetail/:id' , async (req,res) => {
+      const id = req.params.id;
+      const result = await toysCollection.findOne({_id : new ObjectId(id)})
+      res.send(result)
+     })
+
+     //search toys 
+     app.get('/search/:toyName', async (req,res) => {
+        const searchText = req.params.toyName;
+        console.log(searchText)
+        const result = await toysCollection.find(
+        { toyName: { $regex: searchText, $options: "i" } }).toArray()
+        res.send(result)
+
+     })
+
     //  get toys by sub category
      app.get('/toys/:subCategroy' , async (req,res) => {
       const result = await toysCollection.find({
         subCategory: req.params.subCategroy}).toArray()
+      res.send(result)
+     })
+
+     //get gallery photo
+     app.get('/gallery', async(req,res) => {
+      const result = await galleryCollection.find().toArray()
+      res.send(result)
+     })
+
+     //get exclusive toys
+     app.get('/exclusive', async(req,res) => {
+      const result = await exclusiveCollection.find().toArray()
       res.send(result)
      })
 
