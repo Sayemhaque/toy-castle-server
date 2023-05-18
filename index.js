@@ -36,6 +36,13 @@ async function run() {
         res.send(result)
     })
 
+    //  get toys by sub category
+     app.get('/toys/:subCategroy' , async (req,res) => {
+      const result = await toysCollection.find({
+        subCategory: req.params.subCategroy}).toArray()
+      res.send(result)
+     })
+
       
     await client.db("admin").command({ ping: 1 });
     console.log("Pinged your deployment. You successfully connected to MongoDB!");
