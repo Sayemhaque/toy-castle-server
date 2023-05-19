@@ -19,13 +19,21 @@ const client = new MongoClient(uri, {
     version: ServerApiVersion.v1,
     strict: true,
     deprecationErrors: true,
-  }
+  },
+   useNewUrlParser : true,
+    useUnifiedTopology:true,
+    maxPoolSize:10,
 });
 
 async function run() {
   try {
     // Connect the client to the server	(optional starting in v4.7)
-    await client.connect();
+   client.connect((err) => {
+      if(err){
+        console.log(err)
+        return
+      }
+    })
 
     const toysCollection = client.db("toy-castle").collection("toys")
     const galleryCollection = client.db("toy-castle").collection("gallery")
@@ -50,11 +58,24 @@ async function run() {
       res.send(result)
     })
     // get my toys
-    app.get('/toys/email', async (req, res) => {
-      const email = req.query?.email;
-      const result = await toysCollection.find({ sellerEmail: email }).toArray()
+    app.get('/mytoys/:email', async (req, res) => {
+      const email = req.params.email;
+      const result = await toysCollection.find({sellerEmail:email}).toArray()
       res.send(result)
     })
+     // sort toy by price
+     // low to high
+     app.get('/lowest' , async (req,res) => {
+      const result = await toysCollection.find().sort({price: 1}).toArray()
+      res.send(result)
+     })
+      
+     // high to low
+     app.get('/highest' , async (req,res) => {
+      const result = await toysCollection.find().sort({price: -1}).toArray()
+      res.send(result)
+     })
+
     //get single toy
     app.get('/toydetail/:id', async (req, res) => {
       const id = req.params.id;
@@ -73,7 +94,7 @@ async function run() {
     })
 
     //  get toys by sub category
-    app.get('/toys/:subCategroy', async (req, res) => {
+    app.get('/toys/category/:subCategroy', async (req, res) => {
       const result = await toysCollection.find({
         subCategory: req.params.subCategroy
       }).toArray()
@@ -92,8 +113,8 @@ async function run() {
       res.send(result)
     })
 
-    //update my toy
-    app.put('/toy/:id', async (req, res) => {
+    //update a toy
+    app.put('/toy/update/:id', async (req, res) => {
       const id = req.params.id;
       const data = req.body;
       const update = {
@@ -109,6 +130,14 @@ async function run() {
       const result = await toysCollection.updateOne({_id: new ObjectId(id)},update)
       res.send(result)
     })
+
+    //delete a toy
+    app.delete('/toy/delete/:id' ,  async (req,res) => {
+      const id = req.params.id;
+      const result = await toysCollection.deleteOne({_id: new ObjectId(id)})
+      res.send(result);
+    })
+
 
 
     await client.db("admin").command({ ping: 1 });
