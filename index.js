@@ -53,7 +53,7 @@ async function run() {
     })
 
     //get all toys
-    app.get('/toys', async (req, res) => {
+    app.get('/alltoys', async (req, res) => {
       const result = await toysCollection.find().limit(20).toArray()
       res.send(result)
     })
@@ -65,14 +65,16 @@ async function run() {
     })
      // sort toy by price
      // low to high
-     app.get('/lowest' , async (req,res) => {
-      const result = await toysCollection.find().sort({price: 1}).toArray()
+     app.get('/lowest/:email' , async (req,res) => {
+      const email = req.params.email;
+      const result = await toysCollection.find({sellerEmail:email}).sort({price: 1}).toArray()
       res.send(result)
      })
       
      // high to low
-     app.get('/highest' , async (req,res) => {
-      const result = await toysCollection.find().sort({price: -1}).toArray()
+     app.get('/highest/:email' , async (req,res) => {
+      const email = req.params.email;
+      const result = await toysCollection.find({sellerEmail:email}).sort({price: -1}).toArray()
       res.send(result)
      })
 
@@ -114,7 +116,7 @@ async function run() {
     })
 
     //update a toy
-    app.put('/toy/update/:id', async (req, res) => {
+    app.put('/update/:id', async (req, res) => {
       const id = req.params.id;
       const data = req.body;
       const update = {
