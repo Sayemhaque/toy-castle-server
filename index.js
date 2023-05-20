@@ -27,13 +27,6 @@ const client = new MongoClient(uri, {
 
 async function run() {
   try {
-    // Connect the client to the server	(optional starting in v4.7)
-   client.connect((err) => {
-      if(err){
-        console.log(err)
-        return
-      }
-    })
 
     const toysCollection = client.db("toy-castle").collection("toys")
     const galleryCollection = client.db("toy-castle").collection("gallery")
@@ -42,6 +35,7 @@ async function run() {
     const indexKeys = { toyName: 1, };
     const indexOptions = { name: "toyName" };
     const result = await toysCollection.createIndex(indexKeys, indexOptions);
+    console.log(result)
 
 
 
@@ -57,12 +51,14 @@ async function run() {
       const result = await toysCollection.find().limit(20).toArray()
       res.send(result)
     })
+
     // get my toys
     app.get('/mytoys/:email', async (req, res) => {
       const email = req.params.email;
       const result = await toysCollection.find({sellerEmail:email}).toArray()
       res.send(result)
     })
+
      // sort toy by price
      // low to high
      app.get('/lowest/:email' , async (req,res) => {
@@ -78,12 +74,15 @@ async function run() {
       res.send(result)
      })
 
+
     //get single toy
     app.get('/toydetail/:id', async (req, res) => {
       const id = req.params.id;
       const result = await toysCollection.findOne({ _id: new ObjectId(id) })
       res.send(result)
     })
+
+
 
     //search toys 
     app.get('/search/:toyName', async (req, res) => {
@@ -95,6 +94,8 @@ async function run() {
 
     })
 
+
+
     //  get toys by sub category
     app.get('/toys/category/:subCategroy', async (req, res) => {
       const result = await toysCollection.find({
@@ -103,11 +104,15 @@ async function run() {
       res.send(result)
     })
 
+
+
     //get gallery photo
     app.get('/gallery', async (req, res) => {
       const result = await galleryCollection.find().toArray()
       res.send(result)
     })
+
+
 
     //get exclusive toys
     app.get('/exclusive', async (req, res) => {
@@ -132,6 +137,8 @@ async function run() {
       const result = await toysCollection.updateOne({_id: new ObjectId(id)},update)
       res.send(result)
     })
+
+
 
     //delete a toy
     app.delete('/toy/delete/:id' ,  async (req,res) => {
