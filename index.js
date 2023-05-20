@@ -19,7 +19,8 @@ const client = new MongoClient(uri, {
     version: ServerApiVersion.v1,
     strict: true,
     deprecationErrors: true,
-  },
+  }
+  ,
    useNewUrlParser : true,
     useUnifiedTopology:true,
     maxPoolSize:10,
@@ -27,7 +28,7 @@ const client = new MongoClient(uri, {
 
 async function run() {
   try {
-
+      //client.connect();
     const toysCollection = client.db("toy-castle").collection("toys")
     const galleryCollection = client.db("toy-castle").collection("gallery")
     const exclusiveCollection = client.db("toy-castle").collection("exclusive-toys")
