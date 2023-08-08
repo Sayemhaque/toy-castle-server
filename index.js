@@ -20,10 +20,6 @@ const client = new MongoClient(uri, {
     strict: true,
     deprecationErrors: true,
   }
-  ,
-   useNewUrlParser : true,
-    useUnifiedTopology:true,
-    maxPoolSize:10,
 });
 
 async function run() {
@@ -32,13 +28,14 @@ async function run() {
     const toysCollection = client.db("toy-castle").collection("toys")
     const galleryCollection = client.db("toy-castle").collection("gallery")
     const exclusiveCollection = client.db("toy-castle").collection("exclusive-toys")
+    const placeCollection = client.db("toy-castle").collection("places")
 
     const indexKeys = { toyName: 1, };
     const indexOptions = { name: "toyName" };
     const result = await toysCollection.createIndex(indexKeys, indexOptions);
     console.log(result)
 
-
+    
 
     //post toy to the database
     app.post('/toys', async (req, res) => {
@@ -150,7 +147,7 @@ async function run() {
 
 
 
-    await client.db("admin").command({ ping: 1 });
+    // await client.db("admin").command({ ping: 1 });
     console.log("Pinged your deployment. You successfully connected to MongoDB!");
   } finally {
 
