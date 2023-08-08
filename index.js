@@ -6,9 +6,9 @@ const PORT = process.env.PORT || 5000;
 require("dotenv").config();
 
 
-
-app.use(express.json());
 app.use(cors());
+app.use(express.json());
+
 
 
 
@@ -19,7 +19,10 @@ const client = new MongoClient(uri, {
     version: ServerApiVersion.v1,
     strict: true,
     deprecationErrors: true,
-  }
+  },
+    useNewUrlParser : true,
+    useUnifiedTopology:true,
+    maxPoolSize:10,
 });
 
 async function run() {
